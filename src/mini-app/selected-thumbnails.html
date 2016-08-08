@@ -1,0 +1,32 @@
+<link rel="import" href="viewer-el.html">
+<dom-module id="selected-thumbnails">
+    <template>
+      <style>
+        :host{
+          display: flex;
+          flex-flow: row wrap;
+          justify-content: space-around;
+        }
+      </style>
+      <template is="dom-repeat"
+                items="{{objects}}"
+                filter="_isSelected" observe="selected">
+        <viewer-el name="{{item.uid}}"
+                   model="{{item}}"
+                   hover="{{item.selecting}}"></viewer-el>
+      </template>
+    </template>
+    <script>
+      Polymer({
+        is:'selected-thumbnails',
+        properties:{
+          objects:{
+            type:Array
+          }
+        },
+        _isSelected:function(item){
+          return (item.selected == true)
+        }
+      })
+    </script>
+  </dom-module>

@@ -1,0 +1,168 @@
+<script>
+      DraggableBehavior = {
+
+        properties: {
+          _startX:{
+            type:Number,
+            value:0,
+          },
+          _startY:{
+            type:Number,
+            value:0,
+          },
+          dragging:{
+            type:Boolean,
+            value:false
+          },
+          draggable:{
+            type:Boolean,
+            value:true
+          }
+        },
+        listeners: {
+          mousedown: '_handleDown'
+        },
+        _handleDown:function(e){
+          e.preventDefault();
+          this._startX = e.pageX;
+          this._startY = e.pageY;
+          this.listen(this, 'mousemove', '_handleMove');
+          this.listen(this, 'mouseup', '_handleUp');
+        },
+        _handleMove:function(e){
+          e.preventDefault();
+          var deltaX = e.pageX - this._startX;
+          var deltaY =  e.pageY - this._startY;
+          if(!this.dragging){
+            this.dragging = true;
+          }
+          var newX = e.currentTarget.getBoundingClientRect().left + deltaX;
+          var newY = e.currentTarget.getBoundingClientRect().top + deltaY;
+          this._updateCssPosition(e,newX,newY);
+          this._startX = e.pageX;
+          this._startY = e.pageY;
+        },
+        _handleUp:function(e){
+          e.preventDefault();
+          if(this.dragging){
+            this.dragging = false;
+          }
+          this.unlisten(this, 'mousemove', '_handleMove');
+          this.unlisten(this, 'mouseup', '_handleUp');
+        },
+        _updateCssPosition:function(e,leftValue,topValue){
+          e.currentTarget.style.left = leftValue+'px';
+          e.currentTarget.style.top =  topValue+'px';
+        }
+
+      };
+  </script>
+  <dom-module id="test-el">
+    <template>
+       <style>
+           :host {
+               display: block;
+               height: 22px;
+               width: 100%;
+               position: relative;
+           }
+      </style>
+      <simple-zone min-value="{{min}}" max-value="{{max}}">
+          <template  is="dom-repeat" items="{{objects}}">
+              <simple-el  uid="{{item.uid}}"
+                          top-pos=-20
+                          selected={{item.selected}}
+                          selecting={{item.selecting}}
+                          value="{{item.value}}"
+                          ></simple-el>
+          </template>
+      </simple-zone>
+    </template>
+    <script>
+        Polymer({
+            is: 'test-el',
+            properties: {
+              min:{
+                type:Number,
+                value:0,
+                reflectToAttribute: true
+              },
+              max:{
+                type:Number,
+                value:100,
+                reflectToAttribute: true
+              },
+              objects: {
+                type: Array,
+                  value:function(){
+                    return [];
+                  }
+              }
+            },
+            // observers:[
+            //   'objectsPropertyChanged(objects.*)'
+            // ],
+            // objectsPropertyChanged:function(cr){
+            //   if (cr.path.includes('selecting')) {
+            //     var nameSubpath = cr.path.indexOf('.selecting');
+            //     var itempath = cr.path.substring(0, nameSubpath);
+            //     var item = this.get(itempath);
+            //     var index = cr.base.indexOf(item);
+            //     console.log(item)
+            //     // console.log('Item ' + index + ' changed, new name is: ' + item.value);
+            //   }
+            // }
+            // this.fire('send-position',{ left:this.getBoundingClientRect().left,
+            //                             top:this.getBoundingClientRect().top});
+      });
+    </script>
+  </dom-module>
+  <script>
+      HighlightBehavior = {
+        properties: {
+            visibility :{
+              type: String,
+              value: "none"
+            },
+            selecting:{
+              type:Boolean,
+              value: false,
+              reflectToAttribute:true,
+              notify:true
+            }
+        },
+        listeners: {
+          mousedown: '_handleSelected',
+          mouseenter: '_addHightlight',
+          mouseleave: '_removeHighlight'
+        },
+
+        _handleSelected:function(e){
+            if(this.selected){
+                if(e.ctrlKey){
+                    this.set('selected',false);
+                    this.visibility = "none";
+                }
+            }else{
+                if(!e.ctrlKey){
+                    var _children = Polymer.dom(Polymer.dom(this).parentNode).querySelectorAll("simple-el");
+                    for (var i = 0; i < _children.length; i++) {
+                            if( _children[i].selected === true){
+                                _children[i].set('selected',false);
+                            }
+
+                    }
+                }
+                this.set('selected',true);
+                this.visibility = "block";
+            }
+        },
+        _addHightlight:function(){
+
+          this.set('selecting',true);
+        },
+        _removeHighlight:function(){
+          this.set('selecting',false);
+        }
+      };
+  </script>

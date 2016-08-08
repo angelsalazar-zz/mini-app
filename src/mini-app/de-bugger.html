@@ -1,0 +1,35 @@
+<dom-module id="de-bugger">
+    <template>
+      <style>
+        :host{
+          width: 300px;
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          background: white;
+          align-items: center;
+        }
+      </style>
+      <template  is="dom-repeat" items="{{objects}}" >
+        <div>
+          uid:{{item.uid}} <br>
+          param01:{{item.params.param01}} <br>
+          param02:{{item.params.param02}} <br>
+          param03:{{item.params.param03}} <br>
+          selected:{{item.selected}} <br>
+          selecting:{{item.selecting}}
+        </div>
+      </template>
+    </template>
+    <script>
+      Polymer({
+        is:'de-bugger',
+        properties:{
+          objects:{
+            type:Array
+          }
+        },
+        behaviors: [DraggableBehavior],
+      })
+    </script>
+  </dom-module>

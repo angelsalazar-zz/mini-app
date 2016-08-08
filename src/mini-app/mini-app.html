@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="models-provider.html">
+<link rel="import" href="selected-thumbnails.html">
+<link rel="import" href="zone-el.html">
+<link rel="import" href="sliders-zone.html">
+<link rel="import" href="parameters-container.html">
+
+<dom-module id="mini-app">
+    <template>
+      <style>
+        :host{
+          display: block;
+          height: 100vh;
+          /*overflow-y: hidden;*/
+        }
+        .toolbar{
+          background: rgba(50,0,255,0.6);
+        }
+        .toolbar .title{
+          display: inline-block;
+          padding: 20px 10px;
+          color: white;
+        }
+        .content{
+          background: #e5e5e5;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+        }
+        .selected-items{
+          display: flex;
+          flex-flow: row wrap;
+          justify-content: space-around;
+        }
+        sliders-zone > *{
+          padding: 15px 10px;
+        }
+        .debugger{
+          width: 300px;
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          background: white;
+          align-items: center;
+        }
+      </style>
+      <models-provider objects="{{objects}}"></models-provider>
+      <div class="toolbar">
+        <span class="title">Models</span>
+      </div>
+      <div class="content">
+        <!-- <de-bugger objects="{{objects}}"></de-bugger> -->
+        <!-- <sliders-zone objects="{{objects}}"></sliders-zone> -->
+        <parameters-container objects="{{objects}}"></parameters-container>
+        <selected-thumbnails objects="{{objects}}"></selected-thumbnails>
+        <zone-el objects="{{objects}}"></zone-el>
+      </div>
+
+    </template>
+    <script>
+      Polymer({
+        is:'mini-app',
+        properties:{
+
+        }
+      })
+    </script>
+</dom-module>

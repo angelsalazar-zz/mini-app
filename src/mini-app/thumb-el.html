@@ -1,0 +1,90 @@
+<dom-module id="thumb-el">
+    <template>
+      <style>
+        :host{
+          background: tomato;
+          padding: 5px;
+          width: 150px;
+          height: 150px;
+          margin-top: 10px;
+
+          line-height: 150px;
+          color: white;
+          font-weight: bold;
+          font-size: 3em;
+          text-align: center;
+        }
+        :host[selected]{
+          background: orange;
+        }
+        :host[selecting]{
+          background: blue;
+        }
+        :host[selected][selecting]{
+          background: rgba(255,153,0,0.7);
+        }
+      </style>
+      {{name}}
+    </template>
+    <script>
+      Polymer({
+        is:'thumb-el',
+        listeners: {
+          mousedown: '_handleDown',
+          mouseenter: '_handleEnter',
+          mouseleave: '_handleLeave'
+        },
+        properties:{
+          name:{
+            type: String,
+            value: '',
+            reflectToAttribute: true
+          },
+          selectable:{
+            type:Boolean,
+            value:false,
+            reflectToAttribute: true
+          },
+          selecting:{
+            type:Boolean,
+            value:false,
+            reflectToAttribute: true,
+            notify:true
+          },
+          selected:{
+            type:Boolean,
+            value:false,
+            reflectToAttribute: true,
+            notify:true
+          }
+        },
+        _checkSelectStatus:function(selected){
+          if(selected)
+            this.fire('select-thumb',{uidElement:this.name,selected:selected})
+          else
+            this.fire('select-thumb',{uidElement:this.name,selected:selected})
+        },
+        _handleDown:function(e){
+          if(this.selectable){
+            if(this.selected){
+              if(e.ctrlKey){
+                this.set('selected',false);
+              }
+            }else{
+              if(!e.ctrlKey){
+                this.fire('deselect-all');
+              }
+              this.set('selected',true);
+            }
+            e.stopPropagation();
+          }
+        },
+        _handleEnter:function(){
+          this.set('selecting',true);
+        },
+        _handleLeave:function(){
+          this.set('selecting',false);
+        }
+      })
+    </script>
+  </dom-module>

@@ -1,0 +1,176 @@
+<link rel="import" href="../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="simple-slider.html">
+
+<dom-module id="sliders-zone">
+    <template>
+      <style>
+        :host{
+          width: 300px;
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          box-shadow: 3px 3px 35px 1px rgba(0,0,0,0.75);
+        }
+        .slider-parent{
+          padding: 15px 10px;
+        }
+        .wrapper{
+          width: 100%;
+          box-shadow: 3px 3px 35px 1px rgba(0,0,0,0.75);
+          position: absolute;
+        }
+      </style>
+        <template is="dom-if"  if="{{ready}}" >
+          <template is="dom-repeat"  items="{{parametersCollection}}">
+            <div class="slider-parent">
+              <simple-slider objects="{{item.collection}}"></simple-slider>
+            </div>
+          </template>
+        </template>
+    </template>
+    <script>
+      Polymer({
+        is:'sliders-zone',
+        behaviors: [
+           Polymer.IronResizableBehavior
+        ],
+        properties:{
+          objects:{
+            type:Array
+          },
+          parametersCollection:{
+            type:Array,
+            value:function(){
+                return [];
+            },
+            notify:true
+          },
+          _sliderHeight:{
+            type:Number,
+            value:52
+          },
+          ready:{
+              type: Boolean,
+              value:false,
+              notify:true
+          }
+        },
+        observers:[
+          '_parametersCollectionChanged(parametersCollection.*)',
+          '_objectsPropertiesChanged(objects.*)'
+        ],
+        _parametersCollectionChanged:function(cr){
+          // if(cr.path.includes("left")){
+          //   var nameSubpath = cr.path.indexOf('.left');
+          //   var itempath = cr.path.substring(0, nameSubpath);
+          //   var item = this.get(itempath);
+          // }
+          if(cr.path.includes("value")){
+              var nameSubpath = cr.path.indexOf('.value');
+              var itempath = cr.path.substring(0, nameSubpath);
+              var item = this.get(itempath);
+              var i = this._getItemIndex(item)
+              this.set('params.'+item.paramNumber,item.value,this.objects[i])
+              this.notifyPath('objects.'+i+'.params.'+item.paramNumber);
+          }
+          if(cr.path.includes("selecting")){
+              var nameSubpath = cr.path.indexOf('.selecting');
+              var itempath = cr.path.substring(0, nameSubpath);
+              var item = this.get(itempath);
+              var i = this._getItemIndex(item)
+              this.set('selecting',item.selecting,this.objects[i])
+              this.notifyPath('objects.'+i+'.selecting');
+          }
+          if(cr.path.includes("selected")){
+              var nameSubpath = cr.path.indexOf('.selected');
+              var itempath = cr.path.substring(0, nameSubpath);
+              var item = this.get(itempath);
+              var i = this._getItemIndex(item)
+              this.set('selected',item.selected,this.objects[i])
+              this.notifyPath('objects.'+i+'.selected');
+          }
+        },
+        _objectsPropertiesChanged:function(cr){
+          if(cr.path.includes("selected")){
+            // var coords = []
+            var nameSubpath = cr.path.indexOf('.selected');
+            var itempath = cr.path.substring(0, nameSubpath);
+            var item = this.get(itempath);
+            for(var i=0;i<this.parametersCollection.length;i++){
+              for(var j=0;j<this.parametersCollection[i].collection.length;j++){
+                if(this.get('uid',this.parametersCollection[i].collection[j]) == item.uid){
+                  this.set('selected',item.selected,this.parametersCollection[i].collection[j])
+                  this.notifyPath('parametersCollection.'+i+'.collection.'+j+'.selected');
+                  // coords.push(this.parametersCollection[i].collection[j].coordinates)
+                }
+              }
+            }
+            // this.fire('draw-path',{coordsBundle:coords,selected:item.selected})
+            // this.fire('send-path',{
+            //   path:{
+            //     coordsBundle:coords,
+            //     selected:item.selected,
+            //     uid:item.uid
+            //   }
+            // });
+          }
+          if(cr.path.includes("selecting")){
+              var nameSubpath = cr.path.indexOf('.selecting');
+              var itempath = cr.path.substring(0, nameSubpath);
+              var item = this.get(itempath);
+              for(var i=0;i<this.parametersCollection.length;i++){
+                for(var j=0;j<this.parametersCollection[i].collection.length;j++){
+                  if(this.get('uid',this.parametersCollection[i].collection[j]) == item.uid){
+                    this.set('selecting',item.selecting,this.parametersCollection[i].collection[j])
+                    this.notifyPath('parametersCollection.'+i+'.collection.'+j+'.selecting');
+                  }
+                }
+              }
+          }
+        },
+        _toArray:function(jsonObject,uid){
+          if(jsonObject){
+            return Object.keys(jsonObject).map(function(key){
+                return {
+                    "uid": uid,
+                    "paramNumber": key,
+                    "value": jsonObject[key]
+                }
+            });
+          }else {
+            return null;
+          }
+        },
+        attached: function() {
+          this._createSliders(this.objects);
+        },
+        _createSliders:function(models){
+            var paramsLength = Object.keys(models[0].params).length;
+            for(var i=0;i<paramsLength;i++){
+                this.parametersCollection.push({collection:[]});
+            }
+            for(var k=0;k<models.length;k++){
+                var jsonArray = this._toArray(models[k].params,models[k].uid);
+                for(var j=0;j<jsonArray.length;j++){
+                    this.parametersCollection[j].collection.push(jsonArray[j]);
+                }
+            }
+            this.ready = true;
+            this.fire('set-height',{height:(this._sliderHeight*paramsLength)});
+        },
+        _getItemIndex(item){
+          var index;
+          for(var i=0;i<this.objects.length;i++){
+            if(this.get('uid',this.objects[i])==item.uid){
+              index = i;
+              break;
+            }
+          }
+          return index;
+        },
+        computeParametersPath:function(e){
+          console.log(e.detail.coorsBundle)
+        }
+      })
+    </script>
+  </dom-module>

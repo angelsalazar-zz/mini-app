@@ -1,0 +1,7 @@
+{
+  "name": "mini-app",
+  "short_name": "mini-app",
+  "description": "mini main-app",
+  "start_url": "/",
+  "display": "standalone"
+}

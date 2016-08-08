@@ -1,0 +1,192 @@
+<link rel="import" href="highlight-behavior.html">
+
+<dom-module id="simple-el">
+      <template>
+          <style>
+               :host {
+                display: block;
+              }
+              :host[selecting] > .item{
+                stroke:blue;
+                fill:blue;
+              }
+              :host[selected] > .item{
+                stroke: orange;
+                fill: orange;
+              }
+              :host[selected][selecting] > .item{
+                stroke: rgba(255,0,0,0.7);
+                fill: rgba(255,0,0,0.7);
+              }
+              .item{
+                  position: absolute;
+                  margin-left: -10px;
+                  height: 20px;
+                  width:  20px;
+                  stroke: black;
+                  fill: black;
+              }
+              .highlighted{
+                  fill: rgba(0,0,255,0.5);
+              }
+              .value {
+                position: absolute;
+                background-color: #7CADAD;
+                color: #EEEEEE;
+                padding: 3px;
+                width: auto;
+                height: auto;
+                margin-left: -12px;
+                font: 11px arial, sans-serif;
+                border: .5px solid;
+                border-radius: 10px;
+              }
+          </style>
+          <div class="value"
+                style$="left:{{position}}px; display:{{visibility}}; top:{{topPos}}px;"
+                >{{value}}</div>
+          <svg class="item"
+               style$="left:{{position}}px;z-index:{{zIndex}};">
+              <polygon points="5,5 5,15 15,15 15,5">
+          </svg>
+      </template>
+      <script>
+          Polymer({
+              is: 'simple-el',
+              behaviors: [HighlightBehavior],
+              listeners: {
+                  mousedown: '_handleDown'
+              },
+              properties: {
+                  position: {
+                    type: Number,
+                  },
+                  coordinates:{
+                    type:Object,
+                    notify:true
+                  },
+                  isDragging: {
+                      type: Boolean,
+                      value: false,
+                      reflectToAttribute: true
+                  },
+                  selected: {
+                      type: Boolean,
+                      value: false,
+                      reflectToAttribute: true,
+                      notify:true,
+                      observer:'_checkStatus'
+                  },
+                  topPos:{
+                    type: Number,
+                    reflectToAttribute: true
+                  },
+                  _startX:{
+                      type: Number,
+                      value: 0
+                  },
+                  uid: {
+                      type:String,
+                      reflectToAttribute:true
+                  },
+                  value: {
+                    type:Number,
+                    notify:true,
+                    reflectToAttribute:true
+                  },
+                  zIndex:{
+                    type:Number,
+                    value:0
+                  },
+                  topOffSet:{
+                    type:Number,
+                    value:50
+                  }
+              },
+              _checkStatus:function(selected){
+                if(selected){
+                  this.zIndex = 99;
+                }else{
+                  this.zIndex = 0;
+                }
+              },
+              attached:function(){
+                var _zone = Polymer.dom(this).parentNode;
+                this.position = Math.round((this.value*_zone.getBoundingClientRect().width)/(_zone.maxValue));
+                this.set('coordinates',{
+                                          left: this.position,
+                                          top: this.getBoundingClientRect().top-this.topOffSet,
+                                          uid: this.uid
+                                        })
+              },
+              _updatePositionAndValue(position){
+                this.position = position;
+                this.set('coordinates.left',this.position);
+                this.set('coordinates.selected',this.selected);
+                this.set('coordinates.selecting',this.selecting);
+
+                var _zone = Polymer.dom(this).parentNode;
+                this.value = Math.round((position*(_zone.maxValue))/(_zone.getBoundingClientRect().width));
+              },
+              _handleDown: function(e){
+                  e.preventDefault();
+                  this._startX = e.pageX;
+                  this.listen(this, 'mousemove', '_handleMove');
+                  this.listen(this, 'mouseup', '_handleUp');
+                  this.visibility = "block";
+                  e.stopPropagation();
+              },
+              _handleMove: function(e){
+                e.preventDefault();
+                  var deltaX = e.pageX - this._startX;
+                  var _parent = Polymer.dom(this).parentNode;
+                  var _children = Polymer.dom(_parent).querySelectorAll("simple-el");
+                  for(var i=0;i<_children.length;i++){
+                      if(_children[i].selected){
+                          if(!_children[i].isDragging){
+                          _children[i].isDragging = true;
+                          }
+                          var newPosition = _children[i].position + deltaX;
+                          if(newPosition >= 0 && newPosition <= _parent.getBoundingClientRect().width){
+                              if(!_parent.hasReachedMaxLimit && !_parent.hasReachedMinLimit){
+                                _children[i]._updatePositionAndValue(newPosition);
+                                _parent.checkLimitReached(_children[i].position);
+                              }
+                              if(_parent.hasReachedMaxLimit && (deltaX < 0)){
+                                _children[i]._updatePositionAndValue(newPosition);
+                                _parent.checkLimitReached(_children[i].position);
+                              }
+                              if(_parent.hasReachedMinLimit && (deltaX > 0)){
+                                _children[i]._updatePositionAndValue(newPosition);
+                                _parent.checkLimitReached(_children[i].position);
+                              }
+                          }
+                      }
+                  }
+                  // this._startX = e.detail.x;
+                  this._startX = e.pageX;
+                  e.stopPropagation();
+              },
+              _handleUp: function(e){
+                e.preventDefault();
+                  var _children = Polymer.dom(Polymer.dom(this).parentNode).querySelectorAll("simple-el");
+                  for(var i=0;i<_children.length;i++){
+                      if(_children[i].isDragging){
+                          _children[i].isDragging = false;
+                      }
+                  }
+                  this.visibility = "none";
+                  this.unlisten(this, 'mousemove', '_handleMove');
+                  this.unlisten(this, 'mouseup', '_handleUp');
+                  e.stopPropagation();
+              },
+              _displayText:function(value){
+                if(value){
+                  this.visibility = "block";
+                } else {
+                  this.visibility = "none";
+                }
+              }
+          });
+    </script>
+  </dom-module>

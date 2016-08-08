@@ -1,0 +1,49 @@
+<script>
+      HighlightBehavior = {
+        properties: {
+            visibility :{
+              type: String,
+              value: "none"
+            },
+            selecting:{
+              type:Boolean,
+              value: false,
+              reflectToAttribute:true,
+              notify:true
+            }
+        },
+        listeners: {
+          mousedown: '_handleSelected',
+          mouseenter: '_addHightlight',
+          mouseleave: '_removeHighlight'
+        },
+
+        _handleSelected:function(e){
+            if(this.selected){
+                if(e.ctrlKey){
+                    this.set('selected',false);
+                    this.visibility = "none";
+                }
+            }else{
+                if(!e.ctrlKey){
+                    var _children = Polymer.dom(Polymer.dom(this).parentNode).querySelectorAll("simple-el");
+                    for (var i = 0; i < _children.length; i++) {
+                            if( _children[i].selected === true){
+                                _children[i].set('selected',false);
+                            }
+
+                    }
+                }
+                this.set('selected',true);
+                this.visibility = "block";
+            }
+        },
+        _addHightlight:function(){
+
+          this.set('selecting',true);
+        },
+        _removeHighlight:function(){
+          this.set('selecting',false);
+        }
+      };
+  </script>

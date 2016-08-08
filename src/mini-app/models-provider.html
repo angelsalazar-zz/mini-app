@@ -1,0 +1,20 @@
+<dom-module id="models-provider">
+    <script>
+      Polymer({
+        is:'models-provider',
+        properties:{
+          objects:{
+            type:Array,
+            notify:true,
+            value:function(){
+              return [
+                {uid:'qwe',params:{param01:10,param02:56,param03:23,param04:40}},
+                {uid:'ads',params:{param01:30,param02:67,param03:32,param04:77}},
+                {uid:'zxc',params:{param01:50,param02:34,param03:65,param04:67}}
+              ];
+            }
+          }
+        }
+      })
+    </script>
+  </dom-module>

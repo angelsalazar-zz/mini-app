@@ -1,0 +1,53 @@
+<link rel="import" href="simple-zone.html">
+<link rel="import" href="simple-el.html">
+
+<dom-module id="simple-slider">
+    <template>
+       <style>
+           :host {
+               display: block;
+               height: 22px;
+               width: 100%;
+               position: relative;
+           }
+      </style>
+      <simple-zone min-value="{{min}}" max-value="{{max}}">
+          <template  is="dom-repeat" items="{{objects}}">
+              <simple-el  uid="{{item.uid}}"
+                          top-pos=-20
+                          selected={{item.selected}}
+                          selecting={{item.selecting}}
+                          value="{{item.value}}"
+                          coordinates="{{item.coordinates}}"
+                          ></simple-el>
+          </template>
+      </simple-zone>
+    </template>
+    <script>
+        Polymer({
+            is: 'simple-slider',
+            properties: {
+              min:{
+                type:Number,
+                value:0,
+                reflectToAttribute: true
+              },
+              max:{
+                type:Number,
+                value:100,
+                reflectToAttribute: true
+              },
+              objects: {
+                type: Array,
+                  value:function(){
+                    return [];
+                  }
+              }
+            },
+            ready:function(){
+              // this.querySelectorAll('simple-el')
+              // console.log(this.objects);
+            }
+      });
+    </script>
+  </dom-module>

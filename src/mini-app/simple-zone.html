@@ -1,0 +1,55 @@
+<dom-module id="simple-zone">
+    <template>
+        <style>
+             :host {
+                 display: block;
+                 height: 20px;
+                 border:1px solid blue;
+            }
+        </style>
+        <content></content>
+    </template>
+    <script>
+        Polymer({
+            is: 'simple-zone',
+            properties:{
+              minValue:{
+                type: Number,
+                reflectToAttribute: true
+              },
+              maxValue:{
+                type: Number,
+                reflectToAttribute: true
+              },
+                hasReachedMaxLimit:{
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+                hasReachedMinLimit:{
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                }
+
+            },
+            checkLimitReached:function(position){
+                if(position === 0){
+                    this.hasReachedMinLimit = true;
+                    console.log("min limit touched "+this.hasReachedMinLimit);
+                    return;
+                }else if(position === this.getBoundingClientRect().width){
+                    this.hasReachedMaxLimit = true;
+                    console.log("max limit touched "+this.hasReachedMaxLimit);
+                    return;
+                }else{
+                    this.hasReachedMinLimit = false;
+                    this.hasReachedMaxLimit = false;
+                    return;
+                }
+
+            }
+
+        });
+  </script>
+</dom-module>

@@ -1,0 +1,49 @@
+<dom-module id="viewer-el">
+    <template>
+      <style>
+      :host{
+        background: tomato;
+        padding: 5px;
+        width: 300px;
+        height: 300px;
+        margin-top: 10px;
+
+        line-height: 300px;
+        color: white;
+        font-weight: bold;
+        font-size: 2em;
+        text-align: center;
+      }
+      :host[hover]{
+        background: rgba(255,153,0,0.7);
+      }
+      </style>
+      {{name}}
+      {{model.params.param01}}
+      {{model.params.param02}}
+      {{model.params.param03}}
+      {{model.params.param04}}
+
+    </template>
+    <script>
+      Polymer({
+        is:'viewer-el',
+        properties:{
+          model:{
+            type:Object,
+          },
+          name:{
+            type: String,
+            value: '',
+            reflectToAttribute: true
+          },
+          hover:{
+            type: Boolean,
+            value:false,
+            reflectToAttribute:true,
+            notify:true
+          }
+        }
+      })
+    </script>
+  </dom-module>
